@@ -1,13 +1,13 @@
 #include <Adafruit_MCP4728.h>
 #include <Wire.h>
 #include <Shifty.h>
+#include <MIDI.h>
 #include "config.h"
-
-#define CLOCK_PIN 5
 
 Adafruit_MCP4728 mcp;
 Shifty myreg;
 elapsedMillis sinceClock;
+MIDI_CREATE_INSTANCE(HardwareSerial, MIDI_SERIAL, MIDI);
 
 void setup() {
   Serial.begin(115200);
@@ -30,10 +30,23 @@ void setup() {
   usbMIDI.setHandleClock(onClock);
   usbMIDI.setHandleStop(onStop);
   usbMIDI.setHandleContinue(onContinue);
+
+  MIDI.begin();
 }
 
 void loop() {
-  usbMIDI.read();
+  // MIDI thru usb to din
+  if(usbMIDI.read()) {
+    byte data1 = usbMIDI.getData1();
+    byte data2 = usbMIDI.getData2();
+    byte type = usbMIDI.getType();
+    byte channel = usbMIDI.getChannel();
+    
+    MIDI.send(MIDI.getTypeFromStatusByte(type),
+      data1,
+      data2,
+      MIDI.getChannelFromStatusByte(channel));
+  }
 
   if(sinceClock > CLOCK_MS) {
     myreg.writeBit(CLOCK_PIN, LOW);

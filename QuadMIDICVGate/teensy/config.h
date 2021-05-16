@@ -7,6 +7,9 @@
 #define CV_CHANNEL_4    4
 #define GATE_CHANNEL_4  4
 
+#define CLOCK_PIN 5
 #define CLOCK_COUNT     24 // 1/4
 #define CLOCK_MS        2
 #define ZERO_V_MIDI_NOTE  21 //A0
+
+#define MIDI_SERIAL Serial3
